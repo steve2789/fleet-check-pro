@@ -4,7 +4,7 @@ const dbName = "FleetCheckDB";
 const storeName = "offlineDrops";
 
 // Initialize the Local Browser Database (IndexedDB Engine)
-const request = indexedDB.open(dbName, 2); // Upgraded version metrics
+const request = indexedDB.open(dbName, 2); 
 
 request.onupgradeneeded = (event) => {
     db = event.target.result;
@@ -30,22 +30,18 @@ const taxDisplay = document.getElementById('taxDisplay');
 
 shiftBtn.addEventListener('click', () => {
     if (!trackingActive) {
-        // Start Shift
         trackingActive = true;
         shiftBtn.innerText = "🛑 Stop Shift Tracking";
-        shiftBtn.style.backgroundColor = "#dc2626"; // Switch to Red Alert
+        shiftBtn.style.backgroundColor = "#dc2626"; 
         
-        // Simulate real-world odometer accumulation over time
         mileageInterval = setInterval(() => {
-            totalMiles += (Math.random() * 0.15); // Add incremental driving fractions
+            totalMiles += (Math.random() * 0.15); 
             mileageDisplay.innerText = `${totalMiles.toFixed(2)} mi`;
             
-            // Calculate IRS Tax Deduction Matrix
             let totalDeduction = totalMiles * mileageRate;
             taxDisplay.innerText = `$${totalDeduction.toFixed(2)}`;
         }, 3000);
     } else {
-        // End Shift
         trackingActive = false;
         clearInterval(mileageInterval);
         shiftBtn.innerText = "Start Shift Tracking";
@@ -57,12 +53,10 @@ shiftBtn.addEventListener('click', () => {
 document.getElementById('scanBtn').addEventListener('click', () => {
     const lowDataMode = document.getElementById('lowDataToggle').checked;
     
-    // Create high-value localized payload variables
     const newRecord = {
         id: "DROP-" + Date.now(),
         tag: "BARCODE-" + Math.floor(100000 + Math.random() * 900000),
         timestamp: new Date().toLocaleTimeString(),
-        // Anti-Fraud Protection: If low data is checked, save memory. If not, simulate picture binary string
         imageData: lowDataMode ? "[TEXT-ONLY CLEAN MODE]" : "data:image/png;base64,iVBORw0KGgoAAAANS...",
         gps: "40.7128° N, 74.0060° W (Verified Drop)"
     };
@@ -90,11 +84,16 @@ function renderQueue() {
     getAll.onsuccess = () => {
         const records = getAll.result;
         if (records.length === 0) {
-            logBox.innerHTML = "No pending logs cached in local device memory.";
+            logBox.innerHTML = `
+                <div style="text-align: center; padding: 10px;">
+                    <p style="margin-bottom: 8px;">No pending logs cached in local device memory.</p>
+                    <a href="https://gumroad.com" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Get Enterprise Cloud Webhook Matrix →</a>
+                </div>
+            `;
             return;
         }
 
-        logBox.innerHTML = ""; // Clear background container text
+        logBox.innerHTML = ""; 
         records.forEach(rec => {
             logBox.innerHTML += `
                 <div class="log-item">
@@ -108,21 +107,58 @@ function renderQueue() {
     };
 }
 
-// Green Sync Action Control Button
+// Green Sync Action Control Button (Live External Broadcast Network Engine)
 document.getElementById('syncBtn').addEventListener('click', () => {
-    document.getElementById('status').innerText = "Initiating Outbound Cloud Sync...";
+    document.getElementById('status').innerText = "Scanning Airwaves for Network Signal...";
     document.getElementById('status').style.color = "var(--accent)";
 
-    // Simulate Network Sync Pipeline Delay
-    setTimeout(() => {
-        const transaction = db.transaction([storeName], "readwrite");
-        const store = transaction.objectStore(storeName);
-        const clearRequest = store.clear(); // Safely clear records out of local storage
+    if (!navigator.onLine) {
+        setTimeout(() => {
+            document.getElementById('status').innerText = "Sync Failed: Device completely offline!";
+            document.getElementById('status').style.color = "#dc2626";
+        }, 1000);
+        return;
+    }
 
-        clearRequest.onsuccess = () => {
-            document.getElementById('status').innerText = "System Status: Cloud Sync Complete!";
-            document.getElementById('status').style.color = "var(--success)";
-            renderQueue();
-        };
-    }, 1500);
+    const transaction = db.transaction([storeName], "readonly");
+    const store = transaction.objectStore(storeName);
+    const getAll = store.getAll();
+
+    getAll.onsuccess = () => {
+        const records = getAll.result;
+        if (records.length === 0) {
+            document.getElementById('status').innerText = "System Status: Queue is empty.";
+            document.getElementById('status').style.color = "var(--text-muted)";
+            return;
+        }
+
+        // Live Fetch Broadcast Loop payload targeting your enterprise webhook receiver template
+        fetch('https://httpbin.org', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dossierPayload: records,
+                clientToken: "FLEET_PRO_OPEN_SOURCE_SHELL",
+                deploymentOrigin: window.location.origin
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                const writeTransaction = db.transaction([storeName], "readwrite");
+                const writeStore = writeTransaction.objectStore(storeName);
+                writeStore.clear().onsuccess = () => {
+                    document.getElementById('status').innerText = "Cloud Ingestion Complete (Status 200)!";
+                    document.getElementById('status').style.color = "var(--success)";
+                    renderQueue();
+                };
+            } else {
+                throw new Error("Target Receiver Unreachable");
+            }
+        })
+        .catch(error => {
+            console.error('[Fleet-Check Pro Ingestion Error]:', error);
+            document.getElementById('status').innerText = "Error: Enterprise Server Connector Required!";
+            document.getElementById('status').style.color = "var(--accent)";
+        });
+    };
 });
