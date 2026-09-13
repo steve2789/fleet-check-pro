@@ -1,4 +1,3 @@
-// Use code with caution.
 let db;
 const dbName = "FleetCheckDB";
 const storeName = "offlineDrops";
@@ -87,7 +86,7 @@ function renderQueue() {
             logBox.innerHTML = `
                 <div style="text-align: center; padding: 10px;">
                     <p style="margin-bottom: 8px;">No pending logs cached in local device memory.</p>
-                    <a href="https://gumroad.com" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Get Enterprise Cloud Webhook Matrix →</a>
+                    <a href="https://slebron.gumroad.com/l/fleet-check-pro" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Get Enterprise Cloud Webhook Matrix →</a>
                 </div>
             `;
             return;
