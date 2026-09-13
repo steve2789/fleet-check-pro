@@ -19,5 +19,5 @@ Access the interface, toggle the Low-Data Clean Mode configurations, test the op
 
 ## 💼 Commercial Enterprise Add-ons
 The base application shell is engineered for open-source distribution to accelerate driver onboarding velocity. For full turnkey backend pipeline setups, see our pre-configured server modules:
-* **Enterprise Webhook Router Matrix:** Available via https://slebron.gumroad.com/l/fleet-check-pro for direct parsing into Procore, HubSpot, and custom database structures.
+* **Enterprise Webhook Router Matrix:** Available via [https://slebron.gumroad.com/l/fleet-check-pro](https://slebron.gumroad.com/l/fleet-check-pro) for direct parsing into Procore, HubSpot, and custom database structures.
 * **Turnkey Cloud Implementation Pipelines:** Contact our implementation team on Upwork for custom database mapping configurations.
