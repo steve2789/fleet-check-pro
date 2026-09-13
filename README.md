@@ -10,16 +10,12 @@ Standard enterprise software packages drop data, lag, or crash when field operat
 * **Background Sync Service Worker (sw.js):** Intercepts global client traffic to cache static shells and fires network handshakes immediately upon catching a cell signal.
 * **Application Shell Configuration (manifest.webmanifest):** Allows instant, platform-native home screen installation without app store compilation frameworks.
 
-## 🚀 Quickstart Local Deployment
-To execute and run testing environments locally on your computer:
-1. Clone this repository into your local workspace folder directory.
-2. Launch a command terminal inside the project directory and execute a secure network context loop:
-   python -m http.server 8000
-   
-3. Navigate your browser search window directly to:
-   http://localhost:8000
-   
-4. Access Developer Tools (F12), toggle the Network parameters configuration to Offline, and test the operational durability of the field data logging queue!
+## 🚀 Permanent Live Cloud View
+To view and interact with the production environment live on any mobile or desktop browser 24/7, navigate directly to our cloud host deployment:
+
+👉 Permanent Live Application Link: https://github.io
+
+Access the interface, toggle the Low-Data Clean Mode configurations, test the operational durability of the field data logging queue, and see data save locally even when simulated completely offline!
 
 ## 💼 Commercial Enterprise Add-ons
 The base application shell is engineered for open-source distribution to accelerate driver onboarding velocity. For full turnkey backend pipeline setups, see our pre-configured server modules:
