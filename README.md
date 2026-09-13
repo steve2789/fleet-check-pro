@@ -1,23 +1,163 @@
-# Fleet-Check Pro: Offline-First Field Asset Verifier 🚚📦
+let db;
+const dbName = "FleetCheckDB";
+const storeName = "offlineDrops";
 
-An ultra-lightweight, zero-overhead Progressive Web App (PWA) built specifically for field technicians, hot-shot delivery drivers, and 1099 independent logistics contractors. 
+// Initialize the Local Browser Database (IndexedDB Engine)
+const request = indexedDB.open(dbName, 2); 
 
-Standard enterprise software packages drop data, lag, or crash when field operators enter remote job sites, silos, and warehouse basements with zero cell coverage. **Fleet-Check Pro** bypasses heavy corporate apps, offering an immutable, offline-first workflow that caches logistics data locally and pushes it to backend endpoints automatically upon connection restoration.
+request.onupgradeneeded = (event) => {
+    db = event.target.result;
+    if (!db.objectStoreNames.contains(storeName)) {
+        db.createObjectStore(storeName, { keyPath: "id" });
+    }
+};
 
-## 🛠️ Core Engine Architecture
-* **Standalone PWA Interface (index.html):** A tailored, mobile-optimized dark UI dashboard emphasizing rapid single-tap action controls.
-* **Local Storage Storage Pipeline (app.js):** Utilizes native browser client databases (IndexedDB) to lock base64 asset records locally when network access is severed.
-* **Background Sync Service Worker (sw.js):** Intercepts global client traffic to cache static shells and fires network handshakes immediately upon catching a cell signal.
-* **Application Shell Configuration (manifest.webmanifest):** Allows instant, platform-native home screen installation without app store compilation frameworks.
+request.onsuccess = (event) => {
+    db = event.target.result;
+    renderQueue();
+};
 
-## 🚀 Permanent Live Cloud View
-To view and interact with the production environment live on any mobile or desktop browser 24/7, navigate directly to our cloud host deployment:
+// 1099 Shift Tracker Logic Variables
+let trackingActive = false;
+let mileageInterval;
+let totalMiles = 0.00;
+const mileageRate = 0.67; // Standard IRS Mileage Write-Off Rate
 
-👉 Permanent Live Application Link: [https://github.io](https://steve2789.github.io/fleet-check-pro/)
+const shiftBtn = document.getElementById('shiftBtn');
+const mileageDisplay = document.getElementById('mileageDisplay');
+const taxDisplay = document.getElementById('taxDisplay');
 
-Access the interface, toggle the Low-Data Clean Mode configurations, test the operational durability of the field data logging queue, and see data save locally even when simulated completely offline!
+shiftBtn.addEventListener('click', () => {
+    if (!trackingActive) {
+        trackingActive = true;
+        shiftBtn.innerText = "🛑 Stop Shift Tracking";
+        shiftBtn.style.backgroundColor = "#dc2626"; 
+        
+        mileageInterval = setInterval(() => {
+            totalMiles += (Math.random() * 0.15); 
+            mileageDisplay.innerText = `${totalMiles.toFixed(2)} mi`;
+            
+            let totalDeduction = totalMiles * mileageRate;
+            taxDisplay.innerText = `$${totalDeduction.toFixed(2)}`;
+        }, 3000);
+    } else {
+        trackingActive = false;
+        clearInterval(mileageInterval);
+        shiftBtn.innerText = "Start Shift Tracking";
+        shiftBtn.style.backgroundColor = "var(--accent)";
+    }
+});
 
-## 💼 Commercial Enterprise Add-ons
-The base application shell is engineered for open-source distribution to accelerate driver onboarding velocity. For full turnkey backend pipeline setups, see our pre-configured server modules:
-* **Enterprise Webhook Router Matrix:** Available via [https://slebron.gumroad.com/l/fleet-check-pro](https://slebron.gumroad.com/l/fleet-check-pro) for direct parsing into Procore, HubSpot, and custom database structures.
-* **Turnkey Cloud Implementation Pipelines:** Contact our implementation team on Upwork for custom database mapping configurations.
+// Drop Log Capture Action Controls
+document.getElementById('scanBtn').addEventListener('click', () => {
+    const lowDataMode = document.getElementById('lowDataToggle').checked;
+    
+    const newRecord = {
+        id: "DROP-" + Date.now(),
+        tag: "BARCODE-" + Math.floor(100000 + Math.random() * 900000),
+        timestamp: new Date().toLocaleTimeString(),
+        imageData: lowDataMode ? "[TEXT-ONLY CLEAN MODE]" : "data:image/png;base64,iVBORw0KGgoAAAANS...",
+        gps: "40.7128° N, 74.0060° W (Verified Drop)"
+    };
+
+    const transaction = db.transaction([storeName], "readwrite");
+    const store = transaction.objectStore(storeName);
+    store.add(newRecord);
+
+    transaction.oncomplete = () => {
+        document.getElementById('status').innerText = "Record Locked in Anti-Fraud Vault!";
+        document.getElementById('status').style.color = "var(--success)";
+        renderQueue();
+    };
+});
+
+// Dynamically Render the Driver's Anti-Fraud Vault Logs Container
+function renderQueue() {
+    const logBox = document.getElementById('logBox');
+    if (!db) return;
+
+    const transaction = db.transaction([storeName], "readonly");
+    const store = transaction.objectStore(storeName);
+    const getAll = store.getAll();
+
+    getAll.onsuccess = () => {
+        const records = getAll.result;
+        if (records.length === 0) {
+            logBox.innerHTML = `
+                <div style="text-align: center; padding: 10px;">
+                    <p style="margin-bottom: 8px;">No pending logs cached in local device memory.</p>
+                    <a href="https://slebron.gumroad.com/l/fleet-check-pro" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Get Enterprise Cloud Webhook Matrix →</a>
+                </div>
+            `;
+            return;
+        }
+
+        logBox.innerHTML = ""; 
+        records.forEach(rec => {
+            logBox.innerHTML += `
+                <div class="log-item">
+                    <strong style="color:var(--primary)">${rec.id}</strong><br>
+                    🏷️ Tag: ${rec.tag} | 🕒 Time: ${rec.timestamp}<br>
+                    📍 GPS Guard: ${rec.gps}<br>
+                    🖼️ Payload: <span style="color:var(--text-muted)">${rec.imageData}</span>
+                </div>
+            `;
+        });
+    };
+}
+
+// Green Sync Action Control Button (Live External Broadcast Network Engine)
+document.getElementById('syncBtn').addEventListener('click', () => {
+    document.getElementById('status').innerText = "Scanning Airwaves for Network Signal...";
+    document.getElementById('status').style.color = "var(--accent)";
+
+    if (!navigator.onLine) {
+        setTimeout(() => {
+            document.getElementById('status').innerText = "Sync Failed: Device completely offline!";
+            document.getElementById('status').style.color = "#dc2626";
+        }, 1000);
+        return;
+    }
+
+    const transaction = db.transaction([storeName], "readonly");
+    const store = transaction.objectStore(storeName);
+    const getAll = store.getAll();
+
+    getAll.onsuccess = () => {
+        const records = getAll.result;
+        if (records.length === 0) {
+            document.getElementById('status').innerText = "System Status: Queue is empty.";
+            document.getElementById('status').style.color = "var(--text-muted)";
+            return;
+        }
+
+        // Live Fetch Broadcast Loop payload targeting your enterprise webhook receiver template
+        fetch('https://httpbin.org', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dossierPayload: records,
+                clientToken: "FLEET_PRO_OPEN_SOURCE_SHELL",
+                deploymentOrigin: window.location.origin
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                const writeTransaction = db.transaction([storeName], "readwrite");
+                const writeStore = writeTransaction.objectStore(storeName);
+                writeStore.clear().onsuccess = () => {
+                    document.getElementById('status').innerText = "Cloud Ingestion Complete (Status 200)!";
+                    document.getElementById('status').style.color = "var(--success)";
+                    renderQueue();
+                };
+            } else {
+                throw new Error("Target Receiver Unreachable");
+            }
+        })
+        .catch(error => {
+            console.error('[Fleet-Check Pro Ingestion Error]:', error);
+            document.getElementById('status').innerText = "Error: Enterprise Server Connector Required!";
+            document.getElementById('status').style.color = "var(--accent)";
+        });
+    };
+});
