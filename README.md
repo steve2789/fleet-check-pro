@@ -13,7 +13,7 @@ Standard enterprise software packages drop data, lag, or crash when field operat
 ## 🚀 Permanent Live Cloud View
 To view and interact with the production environment live on any mobile or desktop browser 24/7, navigate directly to our cloud host deployment:
 
-👉 Permanent Live Application Link: https://github.io
+👉 Permanent Live Application Link: [https://github.io](https://steve2789.github.io/fleet-check-pro/)
 
 Access the interface, toggle the Low-Data Clean Mode configurations, test the operational durability of the field data logging queue, and see data save locally even when simulated completely offline!
 
